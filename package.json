@@ -1,0 +1,25 @@
+{
+  "name": "parliament.js",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --require babel/register"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/msvbg/parliament.js"
+  },
+  "author": "Martin Svanberg",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/msvbg/parliament.js/issues"
+  },
+  "homepage": "https://github.com/msvbg/parliament.js",
+  "devDependencies": {
+    "babel": "^5.6.14",
+    "jscs": "^1.13.1",
+    "jshint": "^2.8.0",
+    "mocha": "^2.2.5"
+  }
+}
