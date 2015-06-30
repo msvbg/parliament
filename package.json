@@ -1,5 +1,5 @@
 {
-  "name": "parliament.js",
+  "name": "parliament",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/msvbg/parliament.js"
+    "url": "https://github.com/msvbg/parliament"
   },
   "author": "Martin Svanberg",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/msvbg/parliament.js/issues"
+    "url": "https://github.com/msvbg/parliament/issues"
   },
-  "homepage": "https://github.com/msvbg/parliament.js",
+  "homepage": "https://github.com/msvbg/parliament",
   "devDependencies": {
     "babel": "^5.6.14",
     "jscs": "^1.13.1",
