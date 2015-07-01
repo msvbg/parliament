@@ -81,20 +81,37 @@ let curry = function (f, arity) {
     arity = arity || length(f);
 
     function curried() {
-        if (arguments.length === 0) {
+        if (arity > 0 && arguments.length === 0) {
             return curried;
         } else if (arguments.length >= arity) {
             return f.apply(this, arguments);
         } else {
             let g = f.bind.call(f, this, ...arguments);
             g.p$length = Math.max(0, arity - length(arguments));
-            return curry(g, arity - 1);
+            return curry(g);
         }
     }
 
     curried.p$length = arity;
     return curried;
 };
+
+/**
+ * Enforces a specific arity on a function, by setting the internal length
+ * property on the function.
+ *
+ * @param  {number} n   The arity to enforce.
+ * @param  {function} f The function whose arity is to be changed.
+ * @return {function}   The new function with the new arity.
+ */
+let arity = curry(function (n, f) {
+    let arity = (function () {
+        return f.apply(this, arguments);
+    }).bind(this);
+
+    arity.p$length = n;
+    return curry(arity);
+});
 
 /**
  * Evalutes the function `expr`. If truthy, it invokes and returns `then`.
@@ -105,16 +122,19 @@ let curry = function (f, arity) {
  * @param {function}    otherwise   The "else" branch.
  * @return {any}
  */
-let _if = curry(function (expr, then, otherwise) {
-    let args = Array.from(arguments.slice(3));
-    let result;
+let _if = function (expr, then, otherwise) {
+    let args = Array.prototype.slice.call(arguments, 3);
 
-    if (expr.apply(this, args)) {
-        return then.apply(this, args);
-    } else if (otherwise !== undefinde) {
-        return otherwise.apply(this, args);
-    }
-}, 3);
+    let conditional = curry(function () {
+        if (expr.apply(this, arguments)) {
+            return then.apply(this, arguments);
+        } else if (otherwise !== undefined) {
+            return otherwise.apply(this, arguments);
+        }
+    }, length(expr));
+
+    return conditional.apply(this, args);
+};
 
 /**
  * Performs strict === equality on two arguments.
@@ -137,7 +157,7 @@ let equal = curry(function (a, b) {
  */
 let print = function (x) {
     console.log(x);
-    return arguments;
+    return x;
 };
 
 /**
@@ -177,12 +197,13 @@ let id = function (x) {
  * Creates a function which calls a function using an array containing the
  * arguments. Acts like the ... operator in JavaScript.
  *
- * @param  {function} f The function to be called.
- * @return {function}   A function which takes an array of arguments.
+ * @param  {function} f    The function to be called.
+ * @param  {array} args    The argument list.
+ * @return {function}      A function which takes an array of arguments.
  */
-let spread = function (f) {
-    return f.apply.bind(f, this);
-};
+let spread = curry(function (f, args) {
+    return f.apply(this, args);
+});
 
 /**
  * Composes a pipeline of functions, executing them in sequence and feeding
@@ -196,12 +217,12 @@ let seq = function () {
     return function () {
         let f = head(fns);
 
-        if (length(arguments) < length(f)) {
-            return seq(f.apply(this, arguments), ...tail(fns));
-        }
+        // if (length(arguments) < length(f)) {
+        //     return seq(f.apply(this, arguments), ...tail(fns));
+        // }
 
         if (fns.length === 1) {
-            return f.apply(this, ...arguments);
+            return f.apply(this, arguments);
         }
 
         return seq(...tail(fns))(f.apply(this, arguments));
@@ -299,7 +320,7 @@ let match = function () {
     let fns = arguments;
     return function () {
         let f = head(fns);
-        let result = f(...Array.from(arguments));
+        let result = f.apply(this, arguments);
 
         if (isDefined(result)) {
             return result;
@@ -319,7 +340,8 @@ let match = function () {
  * @return {array}                The mapped collection.
  */
 let map = curry(function (f, collection) {
-    return collection.map(i => f(i));
+    console.log(this);
+    return collection.map(i => f.call(this, i));
 });
 
 /**
@@ -332,7 +354,7 @@ let map = curry(function (f, collection) {
  * @return {array}                The filtered collection.
  */
 let filter = curry(function (f, collection) {
-    return collection.filter(i => f(i));
+    return collection.filter(i => f.call(this, i));
 });
 
 /**
@@ -375,23 +397,6 @@ let flatten = function (collection) {
 let flatMap = seq(map, flatten);
 
 /**
- * Enforces a specific arity on a function, by setting the internal length
- * property on the function.
- *
- * @param  {number} n   The arity to enforce.
- * @param  {function} f The function whose arity is to be changed.
- * @return {function}   The new function with the new arity.
- */
-let arity = curry(function (n, f) {
-    let arity = (function () {
-        return f.apply(this, arguments);
-    }).bind(this);
-
-    arity.p$length = n;
-    return curry(arity);
-});
-
-/**
  * Reduces an array to a single object using a binary function `f` as the
  * reducing function.
  *
@@ -414,29 +419,115 @@ let concat = function () {
     return Array.prototype.concat.apply([], arguments);
 };
 
+/**
+ * Computes the sum of an array of numbers.
+ *
+ * @param  {array}      The array to be summed.
+ * @return {number}     The sum.
+ */
 let sum = reduce((a, b) => a + b, 0);
-let difference = reduce((a, b) => a - b);
-let product = reduce((a, b) => a * b, 1);
-let quotient = reduce((a, b) => a / b, 1);
 
+/**
+ * Computes the product of an array of numbers.
+ *
+ * @param  {array}      The array whose numbers are to be multiplied.
+ * @return {number}     The product.
+ */
+let product = reduce((a, b) => a * b, 1);
+
+/**
+ * Adds two numbers.
+ *
+ * @param  {number} a  The first number.
+ * @param  {number} b  The second number.
+ * @return {number}    The sum.
+ */
 let add = curry(function (a, b) {
     return b + a;
 });
 
+/**
+ * Subtracts two numbers.
+ *
+ * @param  {number} a  The number to subtract.
+ * @param  {number} b  The number to be subtracted from
+ * @return {number}    The difference.
+ */
 let subtract = curry(function (a, b) {
     return b - a;
 });
 
+/**
+ * Multiplies two numbers.
+ *
+ * @param  {number} a  The first number.
+ * @param  {number} b  The second number.
+ * @return {number}    The product.
+ */
 let multiply = curry(function (a, b) {
     return b * a;
 });
 
+/**
+ * Divides two numbers.
+ *
+ * @param  {number} a  The denominator.
+ * @param  {number} b  The numerator.
+ * @return {number}    The quotient.
+ */
 let divide = curry(function (a, b) {
     return b / a;
 });
 
-seq(map(subtract(2)), compact, sum, print)
-    ([-1, 2, 5, 6]);
+let val = function (x) {
+    if (isFunction(x)) {
+        return x;
+    }
+
+    return _const(x);
+};
+
+/**
+ * Computes the remainder of b / a.
+ *
+ * @param  {number} a  The divisor.
+ * @param  {number} b  The divident.
+ * @return {number}    The remainder.
+ */
+let mod = curry(function (a, b) {
+    return val(b).call(this) % val(a).call(this);
+});
+
+/**
+ * Returns a range of numbers from `min` to `max`, in intervals of `step`.
+ *
+ * @param  {number} min  The first number of the resulting range.
+ * @param  {number} max  The (exclusive) upper limit.
+ * @param  {number} step The interval between steps.
+ * @return {array}       The range.
+ */
+let range = function (min, max, step = 1) {
+    let ret = [];
+    for (let i = min; i < max; i += step) {
+        ret.push(i);
+    }
+    return ret;
+};
+
+let _let = curry(function (name, value, context) {
+    return function () {
+        let bindings = (this && this.bindings) || {};
+        bindings[name] = value.apply(bindings, arguments);
+
+        return context.apply(bindings, arguments);
+    };
+});
+
+let get = function (name) {
+    return function () {
+        return this[name];
+    };
+};
 
 export default {
     isFunction,
@@ -448,6 +539,7 @@ export default {
     curry,
     if: _if,
     equal,
+    eq: equal,
     print,
     head,
     const: _const,
@@ -457,7 +549,9 @@ export default {
     tail,
     bind,
     greaterThan,
+    gt: greaterThan,
     lessThan,
+    lt: lessThan,
     and,
     or,
     match,
@@ -470,11 +564,13 @@ export default {
     reduce,
     concat,
     sum,
-    difference,
     product,
-    quotient,
     add,
     subtract,
     multiply,
-    divide
+    divide,
+    mod,
+    range,
+    let: _let,
+    get
 };
