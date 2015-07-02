@@ -4,7 +4,7 @@
   "description": "Simple functional utility library.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --require babel/register"
+    "test": "mocha --require babel/register -R min"
   },
   "repository": {
     "type": "git",
