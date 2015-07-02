@@ -39,25 +39,15 @@ describe('vector', function () {
         eq(vec.toArray(), [5, 23, 4, 9, 12]);
         eq(Vector([1, 2]).push(5).pop().pop().push(1).toArray(), [1, 1]);
         eq(Vector().pop().push(1).toArray(), [1]);
+    });
 
-        let v = Vector();
-        let arr = [];
-        for (let i = 0; i < 1000; ++i) {
-            let v2;
-            if (Math.random() > 0.5) {
-                v2 = v.push(i);
-                arr.push(i);
-                console.log(`Pushing ${i}`);
-            } else {
-                v2 = v.pop();
-                arr.pop();
-                console.log(`Poppin'`);
-            }
+    it('should concatenate with other vectors', function () {
+        let v1 = Vector([1, 2]).push(3);
+        let v2 = Vector.of(4).push(5).push(6);
+        let v3 = v1.push(7);
 
-            console.log('  ', v2);
-            console.log('  ', v2.toArray());
-            eq(arr, v2.toArray());
-            v = v2;
-        }
+        eq(Vector().concat(Vector()).toArray(), []);
+        eq(Vector.concat(v1, v2).toArray(), [1, 2, 3, 4, 5, 6]);
+        eq(Vector.concat(v1, v2, v3).toArray(), [1, 2, 3, 4, 5, 6, 1, 2, 3, 7]);
     });
 });

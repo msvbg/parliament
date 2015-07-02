@@ -16,6 +16,8 @@ let create = function (elems = [], parent = null, segmentLength = null) {
         parent = parent.parent || null;
     }
 
+    let length = segmentLength + (parent !== null ? parent.length : 0);
+
     return Object.assign(Object.create(Vector), {
         elems,
         parent,
@@ -36,20 +38,6 @@ let constructor = function (collection) {
     }
 
     return create(collection);
-};
-
-/**
- * Computes the length of a vector.
- *
- * @param  {Vector} vector The vector to be measured.
- * @return {Number}        The length of the vector.
- */
-let length = function (vector) {
-    if (!vector) {
-        return 0;
-    }
-
-    return vector[LENGTH] + length(vector.parent);
 };
 
 /**
@@ -114,7 +102,11 @@ let toArray = function (vector) {
  * @return {Vector} The resulting concatenated vector.
  */
 let concat = function () {
+    let vecs = Array.from(arguments);
+    let catted = vecs.reduce((elems, vec) =>
+        elems.concat(vec.toArray()), []);
 
+    return create(catted);
 };
 
 constructor.of = function () {
@@ -124,11 +116,13 @@ constructor.of = function () {
 constructor.push = curry(push);
 constructor.pop = pop;
 constructor.toArray = toArray;
+constructor.concat = concat;
 
 let Vector = {
     push(elem) { return push(elem, this); },
     pop() { return pop(this); },
-    toArray() { return toArray(this); }
+    toArray() { return toArray(this); },
+    concat() { return concat(this, ...arguments); }
 };
 
 export default constructor;
