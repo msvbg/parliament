@@ -1,51 +1,120 @@
 import { curry } from './operations';
 
-let l = function (x) { console.log(x); return x; };
+/**
+ * Creates a vector based on a JavaScript array and another vector before it.
+ * @private
+ */
+let create = function (elems = [], parent = null, segmentLength = null) {
+    segmentLength = segmentLength !== null ? segmentLength : elems.length;
 
-let create = function (elems = [], parent = null) {
-    let v = Object.create(Vector);
-    return Object.assign(v, { elems, parent });
+    if (segmentLength === 0 && parent !== null) {
+        return parent;
+    }
+
+    // Don't use empty parent segments
+    while (parent && parent.segmentLength === 0) {
+        parent = parent.parent || null;
+    }
+
+    return Object.assign(Object.create(Vector), {
+        elems,
+        parent,
+        length,
+        segmentLength
+    });
 };
 
+/**
+ * Public interface for creating vectors based on a JavaScript array.
+ *
+ * @param  {Array} collection  The array to create the vector from.
+ * @return {Vector}            The vector created from the array.
+ */
 let constructor = function (collection) {
+    if (collection !== undefined && !Array.isArray(collection)) {
+        throw new TypeError('Passed argument is not an array.');
+    }
+
     return create(collection);
 };
 
+/**
+ * Computes the length of a vector.
+ *
+ * @param  {Vector} vector The vector to be measured.
+ * @return {Number}        The length of the vector.
+ */
 let length = function (vector) {
-    if (!vector.parent) {
-        return vector.elems.length;
+    if (!vector) {
+        return 0;
     }
 
-    return vector.elems.length + vector.parent.length;
+    return vector[LENGTH] + length(vector.parent);
 };
 
+/**
+ * Returns a vector with an additional element pushed onto the end of the source
+ * vector.
+ *
+ * @param  {Object} elem   An element to be pushed.
+ * @param  {Vector} vector The source vector.
+ * @return {Vector}        The resulting vector.
+ */
 let push = function (elem, vector) {
-    if (arguments.length === 0) {
-        return vector;
+    if (vector.elems.length <= vector.segmentLength) {
+        vector.elems.push(elem);
+        return create(vector.elems, vector.parent);
+    } else {
+        return create([elem], vector);
     }
-
-    return create([elem], vector);
 };
 
+/**
+ * Returns a vector containing all but the last element of the source vector.
+ *
+ * @param  {Vector} vector The vector to be popped off.
+ * @return {Vector}        The resulting vector.
+ */
 let pop = function (vector) {
-    if (vector.elems.length === 1) {
-        return vector.parent || create();
-    } else if (vector.elems.length === 0) {
+    if (!vector || vector.length === 0) {
         return create();
     }
 
-    return vector.push.apply(vector.parent, vector.elems.slice(0, -1));
+    if (vector.segmentLength > 0) {
+        return create(vector.elems, vector.parent, vector.segmentLength - 1);
+    } else {
+        if (!vector.parent) {
+            return create();
+        }
+
+        return pop(vector.parent);
+    }
 };
 
+/**
+ * Converts the vector to a plain JavaScript array.
+ *
+ * @param  {Vector} vector The vector to be converted.
+ * @return {Array}         The resulting array.
+ */
 let toArray = function (vector) {
     let arr = [];
 
     while (vector && vector.elems) {
-        Array.prototype.unshift.apply(arr, vector.elems);
+        arr.unshift(...(vector.elems.slice(0, vector.segmentLength)));
         vector = vector.parent;
     }
 
     return arr;
+};
+
+/**
+ * Concatenates any number of vectors.
+ *
+ * @return {Vector} The resulting concatenated vector.
+ */
+let concat = function () {
+
 };
 
 constructor.of = function () {
@@ -59,8 +128,7 @@ constructor.toArray = toArray;
 let Vector = {
     push(elem) { return push(elem, this); },
     pop() { return pop(this); },
-    toArray() { return toArray(this); },
-    get length() { return length(this); }
+    toArray() { return toArray(this); }
 };
 
 export default constructor;
