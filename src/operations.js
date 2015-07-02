@@ -4,6 +4,8 @@
  * The funkiest functional JavaScipt library you've never heard of.
  */
 
+const P$LENGTH = Symbol('length');
+
 /**
  * Returns true if the passed argument is considered a function.
  *
@@ -65,7 +67,7 @@ let isFalsy = not(isTruthy);
  */
 let length = function (x) {
     if (isFunction(x)) {
-        return x.p$length || x.length;
+        return x[P$LENGTH] || x.length;
     }
 
     return x.length;
@@ -87,12 +89,12 @@ let curry = function (f, arity) {
             return f.apply(this, arguments);
         } else {
             let g = f.bind.call(f, this, ...arguments);
-            g.p$length = Math.max(0, arity - length(arguments));
+            g[P$LENGTH] = Math.max(0, arity - length(arguments));
             return curry(g);
         }
     }
 
-    curried.p$length = arity;
+    curried[P$LENGTH] = arity;
     return curried;
 };
 
@@ -109,7 +111,7 @@ let arity = curry(function (n, f) {
         return f.apply(this, arguments);
     }).bind(this);
 
-    arity.p$length = n;
+    arity[P$LENGTH] = n;
     return curry(arity);
 });
 
@@ -260,7 +262,7 @@ let bind = function (f) {
     let g = f.call.bind(f, this, ...tail(arguments));
 
     // Function.prototype.length is read-only, so we'll have to make do.
-    g.p$length = Math.max(0, f.length - arguments.length + 1);
+    g[P$LENGTH] = Math.max(0, f.length - arguments.length + 1);
 
     return g;
 };
@@ -340,7 +342,6 @@ let match = function () {
  * @return {array}                The mapped collection.
  */
 let map = curry(function (f, collection) {
-    console.log(this);
     return collection.map(i => f.call(this, i));
 });
 
@@ -514,19 +515,34 @@ let range = function (min, max, step = 1) {
     return ret;
 };
 
-let _let = curry(function (name, value, context) {
-    return function () {
-        let bindings = (this && this.bindings) || {};
-        bindings[name] = value.apply(bindings, arguments);
+let transduce = function (xform, combine, init, coll) {
+    for (let elem of coll) {
+        combine(init, xform(elem));
+    }
 
-        return context.apply(bindings, arguments);
-    };
-});
+    return init;
+};
 
-let get = function (name) {
-    return function () {
-        return this[name];
-    };
+let into = function (init, xform, coll) {
+    if (Array.isArray(init)) {
+        let append = function (result, x) {
+            result.push(x);
+            return result;
+        };
+
+        return transduce(xform, append, init, coll);
+    }
+};
+
+let sequence = function (xform, coll) {
+    if (Array.isArray(coll)) {
+        let append = function (result, x) {
+            result.push(x);
+            return result;
+        };
+
+        return transduce(xform, append, [], coll);
+    }
 };
 
 export default {
@@ -571,6 +587,7 @@ export default {
     divide,
     mod,
     range,
-    let: _let,
-    get
+    transduce,
+    into,
+    sequence
 };

@@ -1,5 +1,5 @@
 import assert from 'assert';
-import P from './';
+import P from '../src';
 
 let eq = assert.deepEqual.bind(assert);
 
@@ -286,11 +286,34 @@ describe('range', function () {
     });
 });
 
-describe('let', function () {
-    it('should bind a name to a value', function () {
+describe('transduce', function () {
+    it('should transform and reduce a collection', function () {
+        let append = function (result, x) {
+            result.push(x);
+            return result;
+        };
+
         eq(
-            P.let('p', P.tail)(P.get('p')) ([1, 2, 3]),
-            [2, 3]
+            P.transduce(P.add(1), append, [], [1, 2, 3]),
+            [2, 3, 4]
+        );
+    });
+});
+
+describe('into', function () {
+    it('should transform and reduce a collection', function () {
+        eq(
+            P.into([], P.add(1), [1, 2, 3]),
+            [2, 3, 4]
+        );
+    });
+});
+
+describe('sequence', function () {
+    it('should transform and reduce a collection', function () {
+        eq(
+            P.sequence(P.add(1), [1, 2, 3]),
+            [2, 3, 4]
         );
     });
 });
