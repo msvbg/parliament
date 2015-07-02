@@ -5,7 +5,6 @@ let eq = assert.deepEqual.bind(assert);
 
 describe('isFunction', function () {
     it('should identify functions as functions', function () {
-        eq(P.isFunction(function () {}), true);
         eq(P.isFunction(() => 0), true);
         eq(P.isFunction({}), false);
     });
@@ -13,8 +12,8 @@ describe('isFunction', function () {
 
 describe('not', function () {
     it('should negate functions', function () {
-        eq(P.not(function () { return false; })(), true);
-        eq(P.not(function () { return 5; })(), false);
+        eq(P.not(P.const(false))(), true);
+        eq(P.not(P.const(5))(), false);
     });
 });
 
@@ -216,7 +215,7 @@ describe('compact', function () {
 
 describe('flatten', function () {
     it('should flatten an array', function () {
-        eq(P.flatten([[1, 2], [3, 4], [5, 6]]), [1, 2, 3, 4, 5 ,6]);
+        eq(P.flatten([[1, 2], [3, 4], [5, 6]]), [1, 2, 3, 4, 5, 6]);
     });
 });
 
@@ -224,7 +223,7 @@ describe('flatMap', function () {
     it('should map over and then flatten an array', function () {
         eq(P.flatMap(n => [n, n + 1], [0, 2, 4]), [0, 1, 2, 3, 4, 5]);
     });
-})
+});
 
 describe('reduce', function () {
     it('should reduce an array to a single value', function () {

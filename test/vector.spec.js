@@ -23,7 +23,6 @@ describe('vector', function () {
         eq(vec1.length, 0);
         eq(vec2.length, 1);
         eq(vec3.length, 0);
-        eq(vec1 === vec3, true);
     });
 
     it('should pop elements off the end', function () {
@@ -31,9 +30,5 @@ describe('vector', function () {
 
         eq(vec.push(4).push(5).push(6).pop().length, 5);
         eq(vec.pop().pop().pop().pop().length, 0);
-
-        console.log(ops.map(Vector.toArray)(ops.map(Vector.push(1))(
-            [Vector.of(1, 2), Vector.of(4, 5)]
-        )));
     });
 });

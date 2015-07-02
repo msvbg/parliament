@@ -57,21 +57,10 @@ constructor.pop = pop;
 constructor.toArray = toArray;
 
 let Vector = {
-    push(elem) {
-        return push(elem, this);
-    },
-
-    pop() {
-        return pop(this);
-    },
-
-    toArray() {
-        return toArray(this);
-    },
-
-    get length() {
-        return length(this);
-    }
+    push(elem) { return push(elem, this); },
+    pop() { return pop(this); },
+    toArray() { return toArray(this); },
+    get length() { return length(this); }
 };
 
 export default constructor;
