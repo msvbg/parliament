@@ -4,6 +4,8 @@
 Underscore, Lodash, Ramda, Highland and similar libraries. It is contained in
 one tiny and tidy ES6 file.
 
+[![Build status][travis-image]][travis-url]
+
 ## Install
 ```
 npm install parliament
@@ -27,3 +29,6 @@ When in doubt, use Lodash. But that doesn't stop me from writing this :)
 
 ## License
 MIT © Martin Svanberg
+
+[travis-image]: https://img.shields.io/travis/msvbg/parliament.svg?style=flat
+[travis-url]: https://travis-ci.org/msvbg/parliament
