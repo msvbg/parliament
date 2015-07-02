@@ -48,14 +48,14 @@ let constructor = function (collection) {
  * @param  {Vector} vector The source vector.
  * @return {Vector}        The resulting vector.
  */
-let push = function (elem, vector) {
+let push = curry(function (elem, vector) {
     if (vector.elems.length <= vector.segmentLength) {
         vector.elems.push(elem);
         return create(vector.elems, vector.parent);
     } else {
         return create([elem], vector);
     }
-};
+});
 
 /**
  * Returns a vector containing all but the last element of the source vector.
