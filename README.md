@@ -12,7 +12,7 @@ npm install parliament
 ```
 
 ## Examples
-One of the strengths of functional programming easily it composes. For instance, this is how you would define `flatMap`:
+One of the strengths of functional programming is how easily it composes. For instance, this is how you would define `flatMap` with parliament.js:
 
 ```js
 let flatMap = seq(map, flatten);
