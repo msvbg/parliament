@@ -37,5 +37,10 @@ describe('Dict', function () {
         eq(d1.delete('b').delete('a').get('a'), undefined);
         eq(d2.delete('a').get('a'), undefined);
         eq(d2.delete('b').get('b'), undefined);
+        eq(d1.delete('x').toObject(), d1.toObject());
+    });
+
+    it('should coerce keys to strings', function () {
+        eq(Dict().set('1', 1).delete(1).get(1), undefined);
     });
 });

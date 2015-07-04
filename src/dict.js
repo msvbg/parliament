@@ -20,7 +20,7 @@ let set = function (key, value, dict) {
 
     dict.map[key] = value;
 
-    return create(dict.map);
+    return create(dict.map, dict.parent, dict.keys.concat(String(key)));
 };
 
 let has = function (key, dict) {
@@ -32,7 +32,7 @@ let get = function (key, dict) {
         return undefined;
     }
 
-    if (dict.map[key]) {
+    if (dict.map[key] !== undefined) {
         return dict.map[key];
     }
 
@@ -41,7 +41,7 @@ let get = function (key, dict) {
 
 let del = function (key, dict) {
     let keys = dict.keys.slice();
-    let index = keys.indexOf(key);
+    let index = keys.indexOf(String(key));
 
     if (index > -1) {
         keys.splice(index, 1);
@@ -51,11 +51,22 @@ let del = function (key, dict) {
     return dict;
 };
 
+let toObject = function (dict) {
+    let obj = {};
+
+    for (let key of dict.keys) {
+        obj[key] = dict.get(key);
+    }
+
+    return obj;
+};
+
 let Dict = {
     set(key, value) { return set(key, value, this); },
     has(key) { return has(key, this); },
     get(key) { return get(key, this); },
-    delete(key) { return del(key, this); }
+    delete(key) { return del(key, this); },
+    toObject() { return toObject(this); }
 };
 
 export default constructor;
