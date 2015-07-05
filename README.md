@@ -1,8 +1,8 @@
 ![parliament.js](https://github.com/msvbg/parliament/raw/master/parliament.png)
 
 > parliament.js is a functional programming utility belt in the vein of
-Underscore, Lodash, Ramda, Highland and similar libraries. It is contained in
-one tiny and tidy ES6 file.
+Underscore, Lodash, Ramda and Highland, with first-class
+support for immutable data structures.
 
 [![Build status][travis-image]][travis-url]
 
@@ -12,7 +12,7 @@ npm install parliament
 ```
 
 ## Examples
-One of the strengths of functional programming is how easily it composes. For instance, this is how you would define `flatMap` with parliament.js:
+One of the strengths of functional programming is how it takes full advantage of composition. For instance, this is how you would define `flatMap` with parliament.js:
 
 ```js
 let flatMap = seq(map, flatten);
@@ -25,7 +25,7 @@ let compact = filter(isTruthy);
 ```
 
 ## Why not X instead?
-When in doubt, use Lodash. But that doesn't stop me from writing this :)
+When in doubt, use Lodash :)
 
 ## License
 MIT © Martin Svanberg
