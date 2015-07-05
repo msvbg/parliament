@@ -50,4 +50,18 @@ describe('vector', function () {
         eq(Vector.concat(v1, v2).toArray(), [1, 2, 3, 4, 5, 6]);
         eq(Vector.concat(v1, v2, v3).toArray(), [1, 2, 3, 4, 5, 6, 1, 2, 3, 7]);
     });
+
+    it('should be equal to identical versions of itself', function () {
+        assert(Vector.of(1, 2).equal(Vector([1, 2])));
+        assert(!Vector.of(1, 2).push(9).equal(Vector([1, 2])));
+        assert(Vector.of(1, 2).push(9).pop().equal(Vector([1, 2])));
+        assert(!Vector.of({}).equal(Vector([{}])));
+    });
+
+    it('should be mappable', function () {
+        let v = Vector.of(1, 2, 3);
+        let f = x => x + 1;
+
+        assert(v.map(f).equal(Vector([2, 3, 4])));
+    });
 });

@@ -7,6 +7,7 @@ import { curry } from './operations';
 let create = function (elems = [], parent = null, segmentLength = null) {
     segmentLength = segmentLength !== null ? segmentLength : elems.length;
 
+    // Discard if empty
     if (segmentLength === 0 && parent !== null) {
         return parent;
     }
@@ -109,6 +110,43 @@ let concat = function () {
     return create(catted);
 };
 
+/**
+ * Compares two vectors and returns true if all corresponding elements are
+ * strictly (===) equal.
+ *
+ * @param  {Vector} a The first vector.
+ * @param  {Vector} b The second vector.
+ * @return {Boolean}}
+ */
+let equal = function (a, b) {
+    if (a.length === b.length) {
+        // Short-circuit if they have same length and same elements.
+        // No need to compare parents as they have to be the same for
+        // identical `elems`.
+        if (a.elems === b.elems) {
+            return true;
+        }
+
+        let arrA = a.toArray(),
+            arrB = b.toArray();
+
+        return arrA.every((elem, i) => elem === arrB[i]);
+    } else {
+        return false;
+    }
+};
+
+/**
+ * Maps over a vector with function f.
+ *
+ * @param  {Function} f      A mapping function.
+ * @param  {Vector} vector   A vector to map over.
+ * @return {Vector}          The mapped vector.
+ */
+let map = function (f, vector) {
+    return create(vector.toArray().map(f));
+};
+
 constructor.of = function () {
     return constructor(Array.from(arguments));
 };
@@ -117,12 +155,15 @@ constructor.push = curry(push);
 constructor.pop = pop;
 constructor.toArray = toArray;
 constructor.concat = concat;
+constructor.equal = equal;
 
 let Vector = {
     push(elem) { return push(elem, this); },
     pop() { return pop(this); },
     toArray() { return toArray(this); },
-    concat() { return concat(this, ...arguments); }
+    concat() { return concat(this, ...arguments); },
+    equal(vec) { return equal(this, vec); },
+    map(f) { return map(f, this); }
 };
 
 export default constructor;
