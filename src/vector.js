@@ -137,6 +137,36 @@ let equal = function (a, b) {
 };
 
 /**
+ * Analogous to `Array.prototype.includes`. Returns true if the vector contains
+ * the specified element, by way of strict equality.
+ *
+ * @param  {Object} elem   The element to be checked for.
+ * @param  {Vector} vector The vector to be searched.
+ * @return {Boolean}       Whether the vector includes the element.
+ */
+let includes = function (elem, vector) {
+    for (let x of vector) {
+        if (x === elem) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+/**
+ * Implements the JavaScript iterator protocol for the vectorr.
+ *
+ * @param  {Vector} vector The vector to be iterated.
+ * @return {Iterator}
+ */
+let iterator = function (vector) {
+    let arr = vector.toArray();
+
+    return arr[Symbol.iterator]();
+};
+
+/**
  * Maps over a vector with function f.
  *
  * @param  {Function} f      A mapping function.
@@ -144,9 +174,85 @@ let equal = function (a, b) {
  * @return {Vector}          The mapped vector.
  */
 let map = function (f, vector) {
-    return create(vector.toArray().map(f));
+    let arr = vector.toArray();
+    return create(arr.map(x => f(x)));
 };
 
+/**
+ * Reduces a vector with function f.
+ *
+ * @param  {Function} f      A reducing function.
+ * @param  {Vector} vector   A vector to reduce.
+ * @return {Object}          The reduced value.
+ */
+let reduce = function (f, identity, vector) {
+    let arr = vector.toArray();
+    return create(arr.reduce(x => f(x), identity));
+};
+
+/**
+ * Filters a vector with function f.
+ *
+ * @param  {Function} f      A filtering function.
+ * @param  {Vector} vector   A vector to filter.
+ * @return {Vector}          The filtered vector.
+ */
+let filter = function (f, vector) {
+    let arr = vector.toArray();
+    return create(arr.filter(x => f(x)));
+};
+
+/**
+ * Creates a vector containing a range of numbers [min, max), inclusive on the
+ * lower bound and exclusive on the upper. If only one argument is specified,
+ * the range is taken to be [0, arg).
+ *
+ * @param  {Number} min  The inclusive lower bound.
+ * @param  {Number} max  The exclusive upper bound.
+ * @param  {Number} step The interval between numbers.
+ * @return {Vector}      The vector containing the range.
+ */
+let range = function (min, max, step = 1) {
+    if (arguments.length === 1) {
+        [min, max] = [0, min];
+    }
+
+    return create(
+        Array.from({ length: Math.ceil((max - min) / step) })
+             .map((n, i) => i * step + min));
+};
+
+/**
+ * Returns true if the vector fulfills the predicate `f` for at least one
+ * element.
+ *
+ * @param  {Function} f    The predicate.
+ * @param  {Vector} vector The vector to check.
+ * @return {Boolean}
+ */
+let some = function (f, vector) {
+    let arr = vector.toArray();
+    return arr.some(x => f(x));
+};
+
+/**
+ * Returns true if the vector fulfills the predicate `f` for all elements.
+ *
+ * @param  {Function} f    The predicate.
+ * @param  {Vector} vector The vector to check.
+ * @return {Boolean}
+ */
+let every = function (f, vector) {
+    let arr = vector.toArray();
+    return arr.every(x => f(x));
+};
+
+/**
+ * An alternative constructor syntax, where each vector element is specified
+ * as an argument to the function.
+ *
+ * @return {Vector} The constructed vector.
+ */
 constructor.of = function () {
     return constructor(Array.from(arguments));
 };
@@ -156,6 +262,8 @@ constructor.pop = pop;
 constructor.toArray = toArray;
 constructor.concat = concat;
 constructor.equal = equal;
+constructor.equals = equal;
+constructor.range = range;
 
 let Vector = {
     push(elem) { return push(elem, this); },
@@ -163,7 +271,14 @@ let Vector = {
     toArray() { return toArray(this); },
     concat() { return concat(this, ...arguments); },
     equal(vec) { return equal(this, vec); },
-    map(f) { return map(f, this); }
+    equals(vec) { return equal(this, vec); },
+    includes(elem) { return includes(elem, this); },
+    [Symbol.iterator]() { return iterator(this); },
+    map(f) { return map(f, this); },
+    reduce(f, id) { return reduce(f, id, this); },
+    filter(f) { return filter(f, this); },
+    some(f) { return some(f, this); },
+    every(f) { return every(f, this); },
 };
 
 export default constructor;

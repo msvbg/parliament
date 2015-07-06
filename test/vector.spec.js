@@ -2,8 +2,11 @@ import assert from 'assert';
 import { Vector, default as ops } from '../src';
 
 let eq = assert.deepEqual.bind(assert);
+let vEq = (v1, v2) => Vector.equals(v1, v2);
 
 describe('vector', function () {
+    let odd = x => Boolean(x % 2);
+
     it('should be constructed with an array as an argument', function () {
         eq(Vector().length, 0);
         eq(Vector([1, 2, 3, 4]).length, 4);
@@ -58,10 +61,63 @@ describe('vector', function () {
         assert(!Vector.of({}).equal(Vector([{}])));
     });
 
-    it('should be mappable', function () {
+    it('should test for inclusion of elements', function () {
+        let v = Vector([1, 2, 3, 4, 5]);
+
+        assert(v.includes(3));
+        assert(!v.includes(6));
+    });
+
+    it('should be iterable', function () {
+        let v = Vector([1, 2, 3, 4, 5]);
+
+        assert(!v.includes(6));
+        for (let elem of v) {
+            assert(v.includes(elem));
+        }
+    });
+
+    it('should map over elements', function () {
         let v = Vector.of(1, 2, 3);
         let f = x => x + 1;
 
         assert(v.map(f).equal(Vector([2, 3, 4])));
+    });
+
+    it('should reduce elements', function () {
+        let v = Vector.of(1, 2, 3, 4);
+        let f = (x, y) => x + y;
+        let g = (x, y) => x * y;
+
+        assert(v.reduce(f, 0, v), 10);
+        assert(v.reduce(g, 0, v), 24);
+    });
+
+    it('should filter elements', function () {
+        let v = Vector.of(1, 2, 3, 4, 5, 6);
+
+        eq(v.filter(odd), Vector.of(1, 3, 5));
+    });
+
+    it('should create finite number ranges as vectors', function () {
+        vEq(Vector.range(4), Vector.of(0, 1, 2, 3));
+        vEq(Vector.range(2, 5), Vector.of(2, 3, 4));
+        vEq(Vector.range(2, 10, 3), Vector.of(2, 5, 8));
+    });
+
+    it('should assert a predicate on every elemenet', function () {
+        let v1 = Vector([1, 9, 3, 4]);
+        let v2 = Vector([1, 9, 3, 13]);
+
+        vEq(v1.every(odd), false);
+        vEq(v2.every(odd), true);
+    });
+
+    it('should assert a predicate on at least one elemenet', function () {
+        let v1 = Vector([1, 9, 3, 4]);
+        let v2 = Vector([2, 4, 16, 32]);
+
+        vEq(v1.some(odd), true);
+        vEq(v2.some(odd), false);
     });
 });
