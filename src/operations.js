@@ -407,8 +407,8 @@ let flatMap = seq(map, flatten);
  * @return {object}              The reduction result.
  */
 let reduce = curry(function (f, identity, collection) {
-    collection = Array.isArray(collection) ? collection : [collection];
-    return collection.reduce(f, identity, collection);
+    //collection = Array.isArray(collection) ? collection : [collection];
+    return collection.reduce(f, identity);
 });
 
 /**

@@ -187,7 +187,7 @@ let map = function (f, vector) {
  */
 let reduce = function (f, identity, vector) {
     let arr = vector.toArray();
-    return create(arr.reduce(x => f(x), identity));
+    return arr.reduce((x, y) => f(x, y), identity);
 };
 
 /**

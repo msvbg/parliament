@@ -89,8 +89,8 @@ describe('vector', function () {
         let f = (x, y) => x + y;
         let g = (x, y) => x * y;
 
-        assert(v.reduce(f, 0, v), 10);
-        assert(v.reduce(g, 0, v), 24);
+        eq(v.reduce(f, 0), 10);
+        eq(v.reduce(g, 1), 24);
     });
 
     it('should filter elements', function () {
