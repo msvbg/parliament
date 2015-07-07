@@ -17,6 +17,16 @@ let isFunction = function (f) {
 };
 
 /**
+ * Determines whether an object implements the JavaScript iterator protocol.
+ *
+ * @param  {Object}  x The object to be tested.
+ * @return {Boolean}   A boolean indicating if the object is iterable.
+ */
+let isIterable = function (x) {
+    return Boolean(x && typeof x[Symbol.iterator] === 'function');
+};
+
+/**
  * Performs a Boolean not on the application of a function
  *
  * @param {function}    f   The function to be negated.
@@ -342,7 +352,17 @@ let match = function () {
  * @return {array}                The mapped collection.
  */
 let map = curry(function (f, collection) {
-    return collection.map(i => f.call(this, i));
+    if (collection.map) {
+        return collection.map(i => f.call(this, i));
+    }
+
+    if (isIterable(collection)) {
+        return (function *() {
+            for (let elem of collection) {
+                yield f(elem);
+            }
+        })();
+    }
 });
 
 /**
@@ -355,7 +375,19 @@ let map = curry(function (f, collection) {
  * @return {array}                The filtered collection.
  */
 let filter = curry(function (f, collection) {
-    return collection.filter(i => f.call(this, i));
+    if (collection.filter) {
+        return collection.filter(i => f.call(this, i));
+    }
+
+    if (isIterable(collection)) {
+        return (function *() {
+            for (let elem of collection) {
+                if (f(elem)) {
+                    yield elem;
+                }
+            }
+        })();
+    }
 });
 
 /**
@@ -401,14 +433,23 @@ let flatMap = seq(map, flatten);
  * Reduces an array to a single object using a binary function `f` as the
  * reducing function.
  *
- * @param  {function} f          The reducing function.
- * @param  {object}   identity   The identity of the binary operation.
- * @param  {array}    collection The collection to reduce.
- * @return {object}              The reduction result.
+ * @param  {Function} f          The reducing function.
+ * @param  {Object}   identity   The identity of the binary operation.
+ * @param  {Array}    collection The collection to reduce.
+ * @return {Object}              The reduction result.
  */
 let reduce = curry(function (f, identity, collection) {
-    //collection = Array.isArray(collection) ? collection : [collection];
-    return collection.reduce(f, identity);
+    if (collection.reduce) {
+        return collection.reduce(f, identity);
+    }
+
+    if (isIterable(collection)) {
+        let ret = identity;
+        for (let elem of collection) {
+            ret = f(ret, elem);
+        }
+        return ret;
+    }
 });
 
 /**
@@ -559,21 +600,29 @@ let take = function (n, coll) {
         return coll.slice(0, n);
     }
 
-    let ret = [];
+    if (coll.of) {
+        let ret = [];
 
-    for (let value of coll) {
-        if (i++ >= n) {
-            break;
+        for (let value of coll) {
+            if (i++ >= n) {
+                break;
+            }
+
+            ret.push(value);
         }
 
-        ret.push(value);
-    }
-
-    if (coll.of) {
         return coll.of(...ret);
     }
 
-    return ret[Symbol.iterator]();
+    return (function *() {
+        for (let elem of coll) {
+            if (i++ >= n) {
+                break;
+            }
+
+            yield elem;
+        }
+    })();
 };
 
 /**
@@ -614,6 +663,7 @@ let drop = function (n, coll) {
 
 export default {
     isFunction,
+    isIterable,
     not,
     isDefined,
     isTruthy,

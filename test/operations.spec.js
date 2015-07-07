@@ -11,6 +11,14 @@ describe('isFunction', function () {
     });
 });
 
+describe('isIterable', function () {
+    it('shuold identify iterable collections', function () {
+        assert(P.isIterable(P.Nat()));
+        assert(P.isIterable([]));
+        assert(!P.isIterable({}));
+    });
+});
+
 describe('not', function () {
     it('should negate functions', function () {
         eq(P.not(P.const(false))(), true);
@@ -200,11 +208,29 @@ describe('map', function () {
     it('should map over arrays', function () {
         eq(inc([1, 2, 3]), [2, 3, 4]);
     });
+
+    it('should map over vectors', function () {
+        eq(inc(P.Vector.of(1, 2, 3)), P.Vector.of(2, 3, 4));
+    });
+
+    it('should map over iterables', function () {
+        eq([...P.take(3, inc(P.Nat()))], [1, 2, 3]);
+    });
 });
 
 describe('filter', function () {
     it('should filter an array', function () {
         eq(P.filter(P.equal(4), [3, 4, 5, 4, 3]), [4, 4]);
+    });
+
+    it('should filter an vector', function () {
+        eq(P.filter(P.equal(4), P.Vector([3, 4, 5, 4, 3])), P.Vector([4, 4]));
+    });
+
+    it('should filter an iterable', function () {
+        let f = P.filter(P.equal(4));
+
+        eq([...f(P.take(5, P.Nat()))], [4]);
     });
 });
 
@@ -227,8 +253,14 @@ describe('flatMap', function () {
 });
 
 describe('reduce', function () {
-    it('should reduce an array to a single value', function () {
+    it('should reduce an array', function () {
         eq(P.reduce((a, b) => a + b, 0, [1, 2, 3, 4]), 10);
+    });
+
+    it('should reduce an iterable', function () {
+        let f = P.reduce((a, b) => a + b, 0);
+
+        eq(f(P.take(10, P.Nat())), 45);
     });
 });
 
