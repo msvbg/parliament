@@ -590,21 +590,26 @@ let drop = function (n, coll) {
         return coll.slice(n);
     }
 
-    let ret = [];
+    if (coll.of) {
+        let ret = [];
 
-    for (let value of coll) {
-        if (i++ < n) {
-            continue;
+        for (let value of coll) {
+            if (i++ < n) {
+                continue;
+            }
+
+            ret.push(value);
         }
 
-        ret.push(value);
-    }
-
-    if (coll.of) {
         return coll.of(...ret);
     }
 
-    return ret[Symbol.iterator]();
+    return (function *() {
+        for (let i = 0; i < n; ++i) {
+            coll.next();
+        }
+        yield *coll;
+    })();
 };
 
 export default {

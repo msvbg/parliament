@@ -354,9 +354,6 @@ describe('drop', function () {
     });
 
     it('should take any number of elements from an iterator', function () {
-        eq(
-            [...P.drop(5, P.take(10, P.Nat()))],
-            [5, 6, 7, 8, 9]
-        );
+        eq([...P.take(5, P.drop(5, P.Nat()))], [5, 6, 7, 8, 9]);
     });
 });
