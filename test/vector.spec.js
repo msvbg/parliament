@@ -120,4 +120,8 @@ describe('vector', function () {
         vEq(v1.some(odd), true);
         vEq(v2.some(odd), false);
     });
+
+    it('should return an empty vector', function () {
+        vEq(Vector.empty(), Vector());
+    });
 });

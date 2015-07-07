@@ -545,6 +545,68 @@ let sequence = function (xform, coll) {
     }
 };
 
+/**
+ * Takes a number `n` elements from the beginning of collection `coll`.
+ *
+ * @param  {Number} n         The number of elements to take.
+ * @param  {Collection} coll  The collection.
+ * @return {Collection}
+ */
+let take = function (n, coll) {
+    let i = 0;
+
+    if (Array.isArray(coll)) {
+        return coll.slice(0, n);
+    }
+
+    let ret = [];
+
+    for (let value of coll) {
+        if (i++ >= n) {
+            break;
+        }
+
+        ret.push(value);
+    }
+
+    if (coll.of) {
+        return coll.of(...ret);
+    }
+
+    return ret[Symbol.iterator]();
+};
+
+/**
+ * Drops a number `n` elements from the beginning of the collection `coll`.
+ *
+ * @param  {Number} n         The number of elements to drop.
+ * @param  {Collection} coll  The collection.
+ * @return {Collection}
+ */
+let drop = function (n, coll) {
+    let i = 0;
+
+    if (Array.isArray(coll)) {
+        return coll.slice(n);
+    }
+
+    let ret = [];
+
+    for (let value of coll) {
+        if (i++ < n) {
+            continue;
+        }
+
+        ret.push(value);
+    }
+
+    if (coll.of) {
+        return coll.of(...ret);
+    }
+
+    return ret[Symbol.iterator]();
+};
+
 export default {
     isFunction,
     not,
@@ -589,5 +651,7 @@ export default {
     range,
     transduce,
     into,
-    sequence
+    sequence,
+    take,
+    drop
 };

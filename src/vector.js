@@ -248,15 +248,25 @@ let every = function (f, vector) {
 };
 
 /**
+ * Returns an empty vector.
+ *
+ * @return {Vector} The empty vector.
+ */
+let empty = function () {
+    return create();
+};
+
+/**
  * An alternative constructor syntax, where each vector element is specified
  * as an argument to the function.
  *
  * @return {Vector} The constructed vector.
  */
-constructor.of = function () {
+let of = function () {
     return constructor(Array.from(arguments));
 };
 
+constructor.of = of;
 constructor.push = curry(push);
 constructor.pop = pop;
 constructor.toArray = toArray;
@@ -264,8 +274,10 @@ constructor.concat = concat;
 constructor.equal = equal;
 constructor.equals = equal;
 constructor.range = range;
+constructor.empty = empty;
 
 let Vector = {
+    of,
     push(elem) { return push(elem, this); },
     pop() { return pop(this); },
     toArray() { return toArray(this); },
@@ -279,6 +291,7 @@ let Vector = {
     filter(f) { return filter(f, this); },
     some(f) { return some(f, this); },
     every(f) { return every(f, this); },
+    empty
 };
 
 export default constructor;

@@ -41,7 +41,15 @@ let mutable = function (data) {
     return data;
 };
 
+let Nat = function* () {
+    let i = 0;
+    while (true) {
+        yield i++;
+    }
+};
+
 export default {
     immutable,
-    mutable
+    mutable,
+    Nat
 };

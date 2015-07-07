@@ -2,6 +2,7 @@ import assert from 'assert';
 import P from '../src';
 
 let eq = assert.deepEqual.bind(assert);
+let vEq = (v1, v2) => P.Vector.equals(v1, v2);
 
 describe('isFunction', function () {
     it('should identify functions as functions', function () {
@@ -313,6 +314,49 @@ describe('sequence', function () {
         eq(
             P.sequence(P.add(1), [1, 2, 3]),
             [2, 3, 4]
+        );
+    });
+});
+
+describe('take', function () {
+    it('should take any number of elements from an array', function () {
+        eq(
+            P.take(5, [0, 1, 2, 3, 4, 5, 6, 7]),
+            [0, 1, 2, 3, 4]
+        );
+    });
+
+    it('should take any number of elements from a vector', function () {
+        vEq(
+            P.take(5, P.Vector([0, 1, 2, 3, 4, 5, 6, 7])),
+            P.Vector([0, 1, 2, 3, 4])
+        );
+    });
+
+    it('should take any number of elements from an iterator', function () {
+        eq(
+            [...P.take(5, P.Nat())],
+            [0, 1, 2, 3, 4]
+        );
+    });
+});
+
+describe('drop', function () {
+    it('should drop any number of elements from an array', function () {
+        eq(P.drop(5, [0, 1, 2, 3, 4, 5, 6, 7]), [5, 6, 7]);
+    });
+
+    it('should take any number of elements from a vector', function () {
+        vEq(
+            P.take(5, P.Vector([0, 1, 2, 3, 4, 5, 6, 7])),
+            P.Vector([5, 6, 7])
+        );
+    });
+
+    it('should take any number of elements from an iterator', function () {
+        eq(
+            [...P.drop(5, P.take(10, P.Nat()))],
+            [5, 6, 7, 8, 9]
         );
     });
 });
