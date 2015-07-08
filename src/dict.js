@@ -1,3 +1,6 @@
+/**
+ * Creates an immutable dictionary. Internal method.
+ */
 let create = function (map, parent = null, keys = null) {
     map = map || Object.create(null);
     keys = keys || Object.keys(map || {});
@@ -9,10 +12,23 @@ let create = function (map, parent = null, keys = null) {
     });
 };
 
+/**
+ * Constructs an immutable dict from a JavaScript object.
+ *
+ * @param  {Object} map The blueprint object.
+ * @return {Dict}       An immutable dict.
+ */
 let constructor = function (map) {
     return create(map);
 };
 
+/**
+ * Returns a new dict with the specified `key` set to `value`.
+ *
+ * @param {String} key   The key to set
+ * @param {Object} value The value to set the key to
+ * @param {Dict} dict    A new immutable dict
+ */
 let set = function (key, value, dict) {
     if (has(key, dict)) {
         return create({ [key]: value }, dict, dict.keys);
@@ -23,10 +39,24 @@ let set = function (key, value, dict) {
     return create(dict.map, dict.parent, dict.keys.concat(String(key)));
 };
 
+/**
+ * Determines whether the given dict has `key` in it or not.
+ *
+ * @param  {String}  key  The key to query for.
+ * @param  {Dict}  dict   The dict to query the key for.
+ * @return {Boolean}
+ */
 let has = function (key, dict) {
     return dict.keys.includes(key);
 };
 
+/**
+ * Retrieves the value of a dict at the given key.
+ *
+ * @param  {String} key  The key to retrieve
+ * @param  {Dict} dict   The dict to query
+ * @return {Object}      The value of the key
+ */
 let get = function (key, dict) {
     if (!dict || dict.keys.indexOf(key) === -1) {
         return undefined;
@@ -39,6 +69,13 @@ let get = function (key, dict) {
     return get(key, dict.parent);
 };
 
+/**
+ * Returns a new immutable dict with `key` removed.
+ *
+ * @param  {String} key  The key to remove
+ * @param  {Dict} dict   The key to base the new dict off
+ * @return {Dict}        A new dict
+ */
 let del = function (key, dict) {
     let keys = dict.keys.slice();
     let index = keys.indexOf(String(key));
@@ -51,6 +88,12 @@ let del = function (key, dict) {
     return dict;
 };
 
+/**
+ * Converts the dict to a plain JavaScript object.
+ *
+ * @param  {dict} dict   The dict to convert
+ * @return {Object}      An object representing the dict
+ */
 let toObject = function (dict) {
     let obj = {};
 

@@ -41,6 +41,11 @@ let mutable = function (data) {
     return data;
 };
 
+/**
+ * Infnite sequence of the natural numbers [0, 1, 2, ...).
+ *
+ * @yield {Number} The next natural number.
+ */
 let Nat = function* () {
     let i = 0;
     while (true) {
