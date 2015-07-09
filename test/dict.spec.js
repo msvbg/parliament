@@ -43,4 +43,20 @@ describe('Dict', function () {
     it('should coerce keys to strings', function () {
         eq(Dict().set('1', 1).delete(1).get(1), undefined);
     });
+
+    it('should select keys from the dictionary', function () {
+        let d1 = Dict({ a: 1, b: 2, c: 3});
+        let d2 = d1.selectKeys(['b', 'c', 'q']);
+
+        eq(d1.toObject(), { a: 1, b: 2, c: 3 });
+        eq(d2.toObject(), { b: 2, c: 3 });
+    });
+
+    it('should omit keys from the dictionary', function () {
+        let d1 = Dict({ a: 1, b: 2, c: 3});
+        let d2 = d1.omitKeys(['b', 'c', 'q']);
+
+        eq(d1.toObject(), { a: 1, b: 2, c: 3 });
+        eq(d2.toObject(), { a: 1 });
+    });
 });

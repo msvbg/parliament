@@ -104,12 +104,46 @@ let toObject = function (dict) {
     return obj;
 };
 
+/**
+ * Selects the keys in `keys` from `dict`. If a key in `keys` does not exist in
+ * the dict, it is ignored.
+ *
+ * @param  {Array} keys  An array of keys to select.
+ * @param  {Dict} dict   A dictionary to select from.
+ * @return {Dict}        A dictionary with the selected keys.
+ */
+let selectKeys = function (keys, dict) {
+    return create(
+        dict.map,
+        dict.parent,
+        dict.keys.filter(k => keys.includes(k))
+    );
+};
+
+/**
+ * Omits the keys in `keys` from `dict`. If a key in `keys` does not exist in
+ * the dict, it is ignored. Opposite of `selectKeys`.
+ *
+ * @param  {Array} keys  An array of keys to omit.
+ * @param  {Dict} dict   A dictionary to omit from.
+ * @return {Dict}        A dictionary with the selected keys.
+ */
+let omitKeys = function (keys, dict) {
+    return create(
+        dict.map,
+        dict.parent,
+        dict.keys.filter(k => !keys.includes(k))
+    );
+};
+
 let Dict = {
     set(key, value) { return set(key, value, this); },
     has(key) { return has(key, this); },
     get(key) { return get(key, this); },
     delete(key) { return del(key, this); },
-    toObject() { return toObject(this); }
+    toObject() { return toObject(this); },
+    selectKeys(keys) { return selectKeys(keys, this); },
+    omitKeys(keys) { return omitKeys(keys, this); }
 };
 
 export default constructor;
