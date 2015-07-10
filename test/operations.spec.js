@@ -389,3 +389,16 @@ describe('drop', function () {
         eq([...P.take(5, P.drop(5, P.Nat()))], [5, 6, 7, 8, 9]);
     });
 });
+
+describe('uniq', function () {
+    it('should remove duplicates from an array', function () {
+        eq(P.uniq([1, 2, 3, 4, 5, 5, 6]), [1, 2, 3, 4, 5, 6]);
+    });
+
+    it('should remove duplicates from a vector', function () {
+        vEq(
+            P.uniq(P.Vector([1, 2, 3, 4, 5, 5, 6])),
+            P.Vector([1, 2, 3, 4, 5, 6])
+        );
+    });
+});

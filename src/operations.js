@@ -593,7 +593,7 @@ let sequence = function (xform, coll) {
  * @param  {Collection} coll  The collection.
  * @return {Collection}
  */
-let take = function (n, coll) {
+let take = curry(function (n, coll) {
     let i = 0;
 
     if (Array.isArray(coll)) {
@@ -623,7 +623,7 @@ let take = function (n, coll) {
             yield elem;
         }
     })();
-};
+});
 
 /**
  * Drops a number `n` elements from the beginning of the collection `coll`.
@@ -632,7 +632,7 @@ let take = function (n, coll) {
  * @param  {Collection} coll  The collection.
  * @return {Collection}
  */
-let drop = function (n, coll) {
+let drop = curry(function (n, coll) {
     let i = 0;
 
     if (Array.isArray(coll)) {
@@ -659,6 +659,30 @@ let drop = function (n, coll) {
         }
         yield *coll;
     })();
+});
+
+/**
+ * Removes all duplicate elements in a collection.
+ *
+ * @param  {Collection} coll The collection
+ * @return {[type]}      [description]
+ */
+let uniq = function (coll) {
+    let ret;
+
+    if (Array.isArray(coll)) {
+        ret = [];
+    } else {
+        ret = coll.empty();
+    }
+
+    for (let elem of coll) {
+        if (!ret.includes(elem)) {
+            ret.push(elem);
+        }
+    }
+
+    return ret;
 };
 
 export default {
@@ -708,5 +732,6 @@ export default {
     into,
     sequence,
     take,
-    drop
+    drop,
+    uniq
 };
