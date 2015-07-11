@@ -672,13 +672,17 @@ let uniq = function (coll) {
 
     if (Array.isArray(coll)) {
         ret = [];
+        for (let elem of coll) {
+            if (!ret.includes(elem)) {
+                ret.push(elem);
+            }
+        }
     } else {
         ret = coll.empty();
-    }
-
-    for (let elem of coll) {
-        if (!ret.includes(elem)) {
-            ret.push(elem);
+        for (let elem of coll) {
+            if (!ret.includes(elem)) {
+                ret = ret.push(elem);
+            }
         }
     }
 

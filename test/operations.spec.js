@@ -2,7 +2,7 @@ import assert from 'assert';
 import P from '../src';
 
 let eq = assert.deepEqual.bind(assert);
-let vEq = (v1, v2) => P.Vector.equals(v1, v2);
+let vEq = (v1, v2) => eq(v1.toArray(), v2.toArray());
 
 describe('isFunction', function () {
     it('should identify functions as functions', function () {
@@ -380,7 +380,7 @@ describe('drop', function () {
 
     it('should take any number of elements from a vector', function () {
         vEq(
-            P.take(5, P.Vector([0, 1, 2, 3, 4, 5, 6, 7])),
+            P.drop(5, P.Vector([0, 1, 2, 3, 4, 5, 6, 7])),
             P.Vector([5, 6, 7])
         );
     });
@@ -399,6 +399,11 @@ describe('uniq', function () {
         vEq(
             P.uniq(P.Vector([1, 2, 3, 4, 5, 5, 6])),
             P.Vector([1, 2, 3, 4, 5, 6])
+        );
+
+        vEq(
+            P.uniq(P.Vector([1, 2, 3, 4, 5, 4, 3, 2, 1, 0])),
+            P.Vector([1, 2, 3, 4, 5, 0])
         );
     });
 });
